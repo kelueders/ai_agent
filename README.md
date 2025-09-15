@@ -12,4 +12,4 @@
 
 1. Activate the virtual environment with `source .venv/bin/activate`.
 
-2. Run with command `uv run main.py`
+2. Run with command `uv run main.py <prompt>`
