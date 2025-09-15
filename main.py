@@ -30,6 +30,7 @@ def main():
     if verbose:
         print(f"User prompt: {user_prompt}")
 
+    # Add the user's prompt to a list called 'messages' (so it can eventually hold the whole conversation)
     messages = [
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
