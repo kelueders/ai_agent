@@ -2,38 +2,49 @@ import re
 
 from functions.get_files_info import get_files_info
 from functions.get_file_content import get_file_content
+from functions.write_file import write_file
 
 def general_tests():
-#     result = get_files_info("calculator", ".")
-#     print("Result for current directory:")
-#     print(result)
-#     print("")
+    '''get_files_info() tests'''
+    # result = get_files_info("calculator", ".")
+    # print("Result for current directory:")
+    # print(result)
+    # print("")
 
-#     result = get_files_info("calculator", "pkg")
-#     print("Result for 'pkg' directory:")
-#     print(result)
+    # result = get_files_info("calculator", "pkg")
+    # print("Result for 'pkg' directory:")
+    # print(result)
 
-    print('Result for "main.py":')
-    print(get_file_content("calculator", "main.py"))
-    print("")
+    '''get_file_content() tests'''
+    # print('Result for "main.py":')
+    # print(get_file_content("calculator", "main.py"))
+    # print("")
 
-    print('Result for "pkg/calculator.py":')
-    print(get_file_content("calculator", "pkg/calculator.py"))
-    print("")
+    # print('Result for "pkg/calculator.py":')
+    # print(get_file_content("calculator", "pkg/calculator.py"))
+    # print("")
     
     # print('Result for "lorem.txt"')
     # print(get_file_content("calculator", "lorem.txt"))
     # print("")
 
-# def test_get_files_bin():
-#     expected = 'Error: Cannot list "/bin" as it is outside the permitted working directory'
-#     actual = get_files_info("calculator", "/bin")
-#     assert expected == actual
+    '''write_file() tests'''
+    # print(write_file("calculator", "lorem.txt", "wait, this isn't lorem ipsum"))
+    # print(write_file("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet"))
+    # print(write_file("calculator", "/tmp/temp.txt", "this should not be allowed"))
 
-# def test_get_files_parent():
-#     expected = 'Error: Cannot list "../" as it is outside the permitted working directory'
-#     actual = get_files_info("calculator", "../")
-#     assert expected == actual
+'''
+PyTest Tests
+'''
+def test_get_files_bin():
+    expected = 'Error: Cannot list "/bin" as it is outside the permitted working directory'
+    actual = get_files_info("calculator", "/bin")
+    assert expected == actual
+
+def test_get_files_parent():
+    expected = 'Error: Cannot list "../" as it is outside the permitted working directory'
+    actual = get_files_info("calculator", "../")
+    assert expected == actual
 
 def test_get_file_content_dir():
     expected = 'Error: Cannot read "/bin/cat" as it is outside the permitted working directory'
@@ -45,6 +56,20 @@ def test_get_file_content_nonexist():
     actual = get_file_content("calculator", "pkg/does_not_exist.py")
     assert expected == actual
 
+def test_write_file_rewrite():
+    expected = 'Successfully wrote to "lorem.txt" (28 characters written)'
+    actual = write_file("calculator", "lorem.txt", "wait, this isn't lorem ipsum")
+    assert expected == actual
+
+def test_write_file_newfile():
+    expected = 'Successfully wrote to "pkg/morelorem.txt" (26 characters written)'
+    actual = write_file("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet")
+    assert expected == actual
+
+def test_write_error():
+    expected = 'Error: Cannot write to "/tmp/temp.txt" as it is outside the permitted working directory'
+    actual = write_file("calculator", "/tmp/temp.txt", "this should not be allowed")
+    assert expected == actual
 
 if __name__ == "__main__":
     general_tests()
