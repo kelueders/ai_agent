@@ -14,13 +14,20 @@ def get_file_content(working_directory, file_path):
     if not os.path.isfile(target_file_abs):
         return f'Error: File not found or is not a regular file: "{file_path}"'
     
+    # Read from the file
     try:
-        # Read from the file
         with open(target_file_abs, "r") as f:
-            file_content_string = f.read(FILE_CHAR_LIMIT)
+            file_content_string = f.read(FILE_CHAR_LIMIT + 1)
+        
+        # Checks that file is actually longer than character limit, not just the exact limit
+        is_truncated = len(file_content_string) > FILE_CHAR_LIMIT
 
-        if len(file_content_string) == FILE_CHAR_LIMIT:
-            file_content_string += f'[...File "{file_path}" truncated at 10000 characters]'
+        if is_truncated:
+            # Revert content string back to char limit size
+            file_content_string = file_content_string[:FILE_CHAR_LIMIT]
+
+            # Add message if file is longer than set character limit
+            file_content_string += f'[...File "{file_path}" truncated at {FILE_CHAR_LIMIT} characters]'
 
         return file_content_string
     except Exception as e:
