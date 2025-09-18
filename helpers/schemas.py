@@ -25,6 +25,7 @@ schema_get_file_content = types.FunctionDeclaration(
                 description="The path to the file from which the content will be extracted.",
             ),
         },
+        required=["file_path"],
     ),
 )
 
@@ -47,6 +48,7 @@ schema_run_python_file = types.FunctionDeclaration(
                 ),
             ),
         },
+        required=["file_path"],
     ),
 )
 
@@ -65,5 +67,6 @@ schema_write_file = types.FunctionDeclaration(
                 description="The code or explanation that will be written to the file."
             ),
         },
+        required=["file_path", "content"],
     ),
 )

@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-from functions.schemas import schema_get_files_info, schema_get_file_content, schema_run_python_file, schema_write_file
+from helpers.call_function import call_function, available_functions
+from helpers.prompts import system_prompt
 
 def main():
     load_dotenv()
@@ -40,27 +41,6 @@ def main():
     generate_content(client, messages, verbose)
 
 def generate_content(client, messages, verbose):
-    system_prompt = """
-        You are a helpful AI coding agent.
-
-        When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
-
-        - List files and directories
-        - Read file contents
-        - Execute Python files with optional arguments
-        - Write or overwrite files
-
-        All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
-        """
-
-    available_functions = types.Tool(
-        function_declarations=[
-            schema_get_files_info,
-            schema_run_python_file,
-            schema_get_file_content,
-            schema_write_file
-        ]
-    )
 
     # Generate the response
     response = client.models.generate_content(
@@ -76,15 +56,17 @@ def generate_content(client, messages, verbose):
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
     
-    functions = response.function_calls
+    if not response.function_calls:
+        return response.text
 
-    if functions:
-        for function in functions:
-            print(f"Calling function: {function.name}({function.args})")
+    for function_call in response.function_calls:
+        result = call_function(function_call, verbose)
 
-    # Print the model response
-    print("RESPONSE:")
-    print(response.text)
+    if not result.parts[0].function_response.response:
+        raise Exception("No functions were called")
+    
+    if verbose:
+        print(f"-> {result.parts[0].function_response.response['result']}")
 
 if __name__ == "__main__":
     main()
