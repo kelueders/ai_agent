@@ -12,4 +12,5 @@
 
 1. Activate the virtual environment with `source .venv/bin/activate`.
 
-2. Run with command `uv run main.py <prompt>`
+2. Run with command `uv run main.py <prompt>`.
+   - Add `--verbose` flag to display token amounts.

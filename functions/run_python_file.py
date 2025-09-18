@@ -27,10 +27,15 @@ def run_python_file(working_directory, file_path, args=[]):
             command.extend(args)
         
         # Run command
-        completed_process = subprocess.run(command, timeout=30, capture_output=True, cwd=working_dir_abs)
+        completed_process = subprocess.run(
+            command, 
+            timeout=30,
+            text=True, 
+            capture_output=True, 
+            cwd=working_dir_abs)
 
         # Extract output from CompletedProcess instance
-        output = f'STDOUT: {completed_process.stdout}\nSTDERR: {completed_process.stderr}'
+        output = f'STDOUT:\n{completed_process.stdout}\nSTDERR:\n{completed_process.stderr}'
         returncode = completed_process.returncode
 
         # Return message if there is no output
