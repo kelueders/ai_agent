@@ -3,6 +3,7 @@ import re
 from functions.get_files_info import get_files_info
 from functions.get_file_content import get_file_content
 from functions.write_file import write_file
+from functions.run_python_file import run_python_file
 
 def general_tests():
     '''get_files_info() tests'''
@@ -32,6 +33,22 @@ def general_tests():
     # print(write_file("calculator", "lorem.txt", "wait, this isn't lorem ipsum"))
     # print(write_file("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet"))
     # print(write_file("calculator", "/tmp/temp.txt", "this should not be allowed"))
+
+    '''run_python_file() tests'''
+    print('Result for "main.py":')
+    print(run_python_file("calculator", "main.py"))
+    print("")
+
+    print('Result for "main.py", ["3 + 5"]')
+    print(run_python_file("calculator", "main.py", ["3 + 5"]))
+    print("")
+
+    print('Result for "tests.py"')
+    print(run_python_file("calculator", "tests.py"))
+    print("")
+
+    print(run_python_file('calculator', '../main.py'))
+    print(run_python_file('calculator', 'nonexistent.py'))
 
 '''
 PyTest Tests
@@ -69,6 +86,16 @@ def test_write_file_newfile():
 def test_write_error():
     expected = 'Error: Cannot write to "/tmp/temp.txt" as it is outside the permitted working directory'
     actual = write_file("calculator", "/tmp/temp.txt", "this should not be allowed")
+    assert expected == actual
+
+def test_run_file_wrong_dir():
+    expected = 'Error: Cannot execute "../main.py" as it is outside the permitted working directory'
+    actual = run_python_file("calculator", "../main.py")
+    assert expected == actual
+
+def test_run_file_nonexistent():
+    expected = 'Error: File "nonexistent.py" not found.'
+    actual = run_python_file("calculator", "nonexistent.py")
     assert expected == actual
 
 if __name__ == "__main__":

@@ -1,6 +1,9 @@
 import os
 
 def write_file(working_directory, file_path, content):
+    '''
+    Function to write content to an existing file or create a new one containing the content.
+    '''
     working_dir_abs = os.path.abspath(working_directory)
     target_file_abs = os.path.abspath(os.path.join(working_directory, file_path))
 

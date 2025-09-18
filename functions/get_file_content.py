@@ -3,6 +3,9 @@ import os
 from config import FILE_CHAR_LIMIT
 
 def get_file_content(working_directory, file_path):
+    '''
+    Function to extract a file's contents so it can be read by the AI Agent
+    '''
     working_dir_abs = os.path.abspath(working_directory)
     target_file_abs = os.path.abspath(os.path.join(working_directory, file_path))
 
