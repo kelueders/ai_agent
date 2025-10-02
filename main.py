@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-from helpers.call_function import call_function, available_functions
-from helpers.prompts import system_prompt
+from helpers.generate_content import generate_content
+from config import MAX_ITERATIONS
 
 def main():
     load_dotenv()
@@ -33,51 +33,31 @@ def main():
     if verbose:
         print(f"User prompt: {user_prompt}")
 
-    # Add the user's prompt to a list called 'messages' (so it can eventually hold the whole conversation)
+    # Add the user's prompt to a list of Content objects called 'messages' (so it can eventually hold the whole conversation)
     messages = [
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
     
-    generate_content(client, messages, verbose)
+    iteration_count = 1
 
-def generate_content(client, messages, verbose):
-
-    # Generate the response
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-001", 
-        contents=messages,
-        config=types.GenerateContentConfig(
-            system_instruction=system_prompt,
-            tools=[available_functions])
-    )
-
-    # Iterate over each candidate and add its content to the messages list
-    for candidate in response.candidates:
-        messages.append(candidate.content)
-
-    # If the verbose flag is present, print token amounts used
-    if verbose == True:
-        print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-        print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+    while iteration_count <= MAX_ITERATIONS:
     
-    # If the prompt doesn't require a function call, just return a text response
-    if not response.function_calls:
-        return response.text
+        try:
+            response, messages = generate_content(client, messages, verbose)
+        except Exception as e:
+            return f"Error generating content: {e}"
+        
+        # If the response contains a text response that is explainable to a human
+        #   then the model is done iterating (thinking), so return the final response
+        if response.text:
+            print("")
+            print(f"FINAL RESPONSE: {response.text}")
+            break
 
-    function_responses = []
-    for function_call_part in response.function_calls:
-        result = call_function(function_call_part, verbose)
+        iteration_count += 1
 
-        if not result.parts[0].function_response or not result.parts:
-            raise Exception("No functions were called")
+    if iteration_count > MAX_ITERATIONS:
+        print(f"The model is set to only run {MAX_ITERATIONS} times. Please try again with a more simple prompt.")
     
-        if verbose:
-            print(f"-> {result.parts[0].function_response.response['result']}")
-
-        function_responses.append(result.parts[0])
-    
-    if not function_responses:
-        raise Exception("No function responses generated, exiting")
-
 if __name__ == "__main__":
     main()

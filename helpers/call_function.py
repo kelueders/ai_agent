@@ -36,6 +36,7 @@ def call_function(function_call_part, verbose=False):
 
     func = funct_dict.get(func_name)
 
+    # If the function is not in the dict, return an error
     if func is None:
         return types.Content(
             role="tool",
@@ -49,6 +50,7 @@ def call_function(function_call_part, verbose=False):
     
     function_result = func(**args)
 
+    # Return the result of the function call
     return types.Content(
         role="tool",
         parts=[
