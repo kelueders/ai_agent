@@ -51,22 +51,33 @@ def generate_content(client, messages, verbose):
             tools=[available_functions])
     )
 
+    # Iterate over each candidate and add its content to the messages list
+    for candidate in response.candidates:
+        messages.append(candidate.content)
+
     # If the verbose flag is present, print token amounts used
     if verbose == True:
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
     
+    # If the prompt doesn't require a function call, just return a text response
     if not response.function_calls:
         return response.text
 
-    for function_call in response.function_calls:
-        result = call_function(function_call, verbose)
+    function_responses = []
+    for function_call_part in response.function_calls:
+        result = call_function(function_call_part, verbose)
 
-    if not result.parts[0].function_response.response:
-        raise Exception("No functions were called")
+        if not result.parts[0].function_response or not result.parts:
+            raise Exception("No functions were called")
     
-    if verbose:
-        print(f"-> {result.parts[0].function_response.response['result']}")
+        if verbose:
+            print(f"-> {result.parts[0].function_response.response['result']}")
+
+        function_responses.append(result.parts[0])
+    
+    if not function_responses:
+        raise Exception("No function responses generated, exiting")
 
 if __name__ == "__main__":
     main()

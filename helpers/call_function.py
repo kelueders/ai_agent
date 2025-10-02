@@ -5,6 +5,7 @@ from functions.get_files_info import get_files_info
 from functions.get_file_content import get_file_content
 from functions.write_file import write_file
 from functions.run_python_file import run_python_file
+from config import WORKING_DIR
 
 available_functions = types.Tool(
     function_declarations=[
@@ -24,7 +25,7 @@ def call_function(function_call_part, verbose=False):
     else:
         print(f" - Calling function: {func_name}")
 
-    args["working_directory"] = "./calculator"
+    args["working_directory"] = WORKING_DIR
 
     funct_dict = {
         "get_files_info": get_files_info,
