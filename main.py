@@ -26,7 +26,7 @@ def main():
     api_key = os.environ.get("GEMINI_API_KEY")
     client = genai.Client(api_key=api_key)
 
-    # Combine all non-flag args to create the user prompt
+    # Combine all non-flag args into a string to create the user prompt
     user_prompt = " ".join(args)
 
     # If verbose flag is present, print user prompt
@@ -38,26 +38,17 @@ def main():
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
     
-    iteration_count = 1
-
-    while iteration_count <= MAX_ITERATIONS:
+    try:
+        response, messages = generate_content(client, messages, verbose)
+    except Exception as e:
+        return f"Error generating content: {e}"
     
-        try:
-            response, messages = generate_content(client, messages, verbose)
-        except Exception as e:
-            return f"Error generating content: {e}"
-        
-        # If the response contains a text response that is explainable to a human
-        #   then the model is done iterating (thinking), so return the final response
-        if response.text:
-            print("")
-            print(f"FINAL RESPONSE: {response.text}")
-            break
+    # If the response contains a text response that is explainable to a human
+    #   then the model is done iterating (thinking), so return the final response
+    if response.text:
+        print("")
+        print(f"FINAL RESPONSE: {response.text}")
 
-        iteration_count += 1
-
-    if iteration_count > MAX_ITERATIONS:
-        print(f"The model is set to only run {MAX_ITERATIONS} times. Please try again with a more simple prompt.")
     
 if __name__ == "__main__":
     main()

@@ -34,6 +34,7 @@ def call_function(function_call_part, verbose=False):
         "run_python_file": run_python_file
     }
 
+    # Match the function name (key) with the actual function (value) from the dict
     func = funct_dict.get(func_name)
 
     # If the function is not in the dict, return an error
@@ -48,6 +49,7 @@ def call_function(function_call_part, verbose=False):
             ],
         )
     
+    # Call the function with necessary args and save the result into a variable
     function_result = func(**args)
 
     # Return the result of the function call
