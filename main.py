@@ -37,18 +37,31 @@ def main():
     messages = [
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
-    
-    try:
-        response, messages = generate_content(client, messages, verbose)
-    except Exception as e:
-        return f"Error generating content: {e}"
-    
-    # If the response contains a text response that is explainable to a human
-    #   then the model is done iterating (thinking), so return the final response
-    if response.text:
-        print("")
-        print(f"FINAL RESPONSE: {response.text}")
 
+    # Set counter
+    iteration_count = 1
+
+    # Run the generate_content() function only until it reaches a maximum number of iterations
+    while iteration_count <= MAX_ITERATIONS:
+    
+        try:
+            final_response = generate_content(client, messages, verbose)
+
+            # If the response contains a text response that is explainable to a human
+            #   then the model is done iterating, so return the final response
+            if final_response:
+                print("")
+                print("FINAL RESPONSE:")
+                print(final_response)
+                break
+        except Exception as e:
+            return f"Error generating content: {e}"
+        
+        iteration_count += 1
+    
+    if iteration_count > MAX_ITERATIONS:
+        print(f"You maxed out on turns. The model is set to only run {MAX_ITERATIONS} times. Please try again with a more simple prompt.")
+        raise Exception("Max iterations")
     
 if __name__ == "__main__":
     main()
