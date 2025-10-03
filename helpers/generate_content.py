@@ -1,6 +1,6 @@
 from google.genai import types
 
-from helpers.call_function import call_function, available_functions
+from helpers.call_function import available_functions
 from helpers.gen_func_responses import gen_func_responses
 from helpers.prompts import system_prompt
 from config import MAX_ITERATIONS
